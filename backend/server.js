@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const {blogData} = require('./schema/blogSchema');
+const {blogData, commentData} = require('./schema/blogSchema');
 const {SignUp , LogIn} = require('./controller/auth');
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -52,8 +52,40 @@ app.post('/api/addblog',async(req,res)=>{
     await newData.save();
 })
 
-app.get('/api/blogs',async(req,res)=>{
+app.get('/api/getallblogs',async(req,res)=>{
     const blogs = await blogData.find();
-    //res.json({blogs})
-    console.log(blogs)
+    res.json({blogs})
 })
+
+app.get('/api/getBlog',async(req,res)=>{
+
+})
+
+app.post('/api/blogs/:blogId/comments', async (req, res) => {
+  console.log('recieved');
+  try {
+    const { blogId } = req.params;
+    const { content, userId } = req.body; // Getting content and userId from the request body
+
+    // Create a new comment
+    const newComment = new commentData({
+      content,
+      user: userId,
+    });
+
+    // Save the comment to the database
+    const savedComment = await newComment.save();
+
+    // Find the blog post and add the comment ID to its comments array
+    const blog = await blogData.findById(blogId);
+    blog.comments.push(savedComment);
+    await blog.save();
+
+    // Populate the user field for the newly saved comment
+    const populatedComment = await savedComment.populate('user', 'username email').execPopulate();
+    console.log(populatedComment)
+    res.status(201).json(populatedComment);
+  } catch (error) {
+    res.status(500).json({ message: 'Error adding comment', error });
+  }
+});

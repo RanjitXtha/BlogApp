@@ -2,11 +2,15 @@ import React, { useContext } from 'react'
 import {useEffect, useState} from 'react';
 import { UserAuthContext } from '../Context/userAuth';
 
+import Comment from '../Sections/Comment';
+
 const Home = () => {
     const {userId,username} = useContext(UserAuthContext);
     
     const [mainTitle , setMainTitle] = useState('');
     const [components, setComponents] = useState([]);
+
+    const [blogs ,setBlogs] = useState([])
   
   
     const addComponent = (type) => {
@@ -44,8 +48,10 @@ const Home = () => {
   
     useEffect(()=>{
       const getBlogs =async()=>{
-        const response = await fetch('http://localhost:5000/api/blogs');
-        const data = response.json();
+        const response = await fetch('http://localhost:5000/api/getallblogs');
+        const data = await response.json();
+        setBlogs(data.blogs)
+        console.log(data.blogs)
       }
       getBlogs();
     },[])
@@ -114,6 +120,30 @@ const Home = () => {
             <button type="submit">Submit</button>
           </div>
         </form>
+        
+        <section>
+          {
+            blogs.map((blog=>(
+              <div className='block mb-10'>
+                <p>{blog.author}</p>
+                <p>{blog.title}</p>
+                {
+                  blog.content.map(content=>(
+                    <p>{content.content}</p>
+                  ))
+                }
+
+              <div>
+                <Comment blogId={blog._id} />
+              </div>
+              </div>
+            )))
+
+           
+          }
+
+          
+        </section>
   
         </div>
     )
