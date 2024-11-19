@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { UserAuthContext } from '../Context/userAuth';
-
+import { UserAuthContext } from '../Context/userAuth'
 const Comment = ({ blogId }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
-  const {userId} = useContext(UserAuthContext)
+  const { userId } = useContext(UserAuthContext);
 
   // Fetch comments when the component loads
   useEffect(() => {
@@ -18,8 +17,8 @@ const Comment = ({ blogId }) => {
       }
     };
 
-    //fetchComments();
-  }, [blogId]);
+    fetchComments();
+  }, [blogId]);  // Make sure comments are fetched based on the blogId
 
   // Handle submitting a new comment
   const handleCommentSubmit = async (e) => {
@@ -33,10 +32,12 @@ const Comment = ({ blogId }) => {
         },
         body: JSON.stringify({ content: newComment, userId }),
       });
+      const addedComment = await response.json();
+      console.log(addedComment)
 
       if (response.ok) {
-        const addedComment = await response.json();
-        setComments([...comments, addedComment]); // Update the comments list
+        // Directly update the state to include the new comment without re-fetching
+        setComments((prevComments) => [...prevComments, addedComment]);
         setNewComment(''); // Clear the input field
       } else {
         console.error('Failed to post comment');
@@ -51,13 +52,17 @@ const Comment = ({ blogId }) => {
       <h2>Comments</h2>
 
       {/* Display the list of comments */}
-      {comments.map((comment) => (
-        <div key={comment._id} className="comment">
-          <p>
-            <strong>{comment.user?.username || 'Anonymous'}</strong>: {comment.content}
-          </p>
-        </div>
-      ))}
+      {comments.length > 0 ? (
+        comments.map((comment) => (
+          <div key={comment._id} className="comment">
+            <p>
+              <strong>{comment.user?.username || 'Anonymous'}</strong>: {comment.content}
+            </p>
+          </div>
+        ))
+      ) : (
+        <p>No comments yet.</p>
+      )}
 
       <form onSubmit={handleCommentSubmit}>
         <textarea
