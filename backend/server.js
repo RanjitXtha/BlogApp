@@ -39,18 +39,29 @@ app.post('/login',LogIn);
 
 
 
-app.post('/api/addblog',async(req,res)=>{
-    const {userId ,title,author,content} = req.body;
-    console.log('recived');
-    console.log(title + author +userId );
-    console.log(content)
+app.post('/api/addblog', upload.single('image'), async (req, res) => {
+  const { userId, title, author, content } = req.body;
+  const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;  // Get the image URL if available
 
-    const newData = new blogData({
-       title , author ,userId, content
-    })
+  console.log('Received blog post data:');
+  console.log(title, author, userId);
+  console.log(content);
 
+  const newData = new blogData({
+    title,
+    author,
+    userId,
+    content,
+    image: imageUrl,  // Save the image URL in the blog post
+  });
+
+  try {
     await newData.save();
-})
+    res.status(201).json(newData);  // Return the newly created blog post
+  } catch (error) {
+    res.status(500).json({ message: 'Error adding blog post', error });
+  }
+});
 
 app.get('/api/getallblogs',async(req,res)=>{
     const blogs = await blogData.find();
