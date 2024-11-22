@@ -3,6 +3,7 @@ import {useEffect, useState} from 'react';
 import { UserAuthContext } from '../Context/userAuth';
 import Header from '../Sections/Header';
 import { useNavigate } from 'react-router-dom';
+import AddTags from '../Sections/AddTags';
 
 const Create = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const Create = () => {
     const [mainTitle, setMainTitle] = useState('');
     const [components, setComponents] = useState([]);
     const [imagePreview, setImagePreview] = useState(null); 
+    const [tags , setTags] = useState([]);
 
     const addComponent = (type) => {
         setComponents([...components, { type, content: '' }]);
@@ -51,12 +53,6 @@ const Create = () => {
             formData.append(`image-${index}`, component.content); // Append File objects
           }
         });
-
-        //console.log(formData)
-        
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}:`, value);
-          }
       
         const response = await fetch('http://localhost:5000/api/addblog', {
           method: 'POST',
@@ -150,6 +146,7 @@ const Create = () => {
               <option value="title">Title</option>
             </select>
           </div>
+          <AddTags setTags = {setTags} tags = {tags} />
 
           <button type="submit" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md">
             Submit
