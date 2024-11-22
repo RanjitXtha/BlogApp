@@ -72,6 +72,11 @@ const Create = () => {
       }
       };
 
+      const deleteComponent = (index)=>{
+        const filteredComponent = components.filter((_,i)=>i !== index)
+        setComponents(filteredComponent);
+      }
+
 
   return (
     <div>
@@ -88,13 +93,17 @@ const Create = () => {
           {components.map((component, index) => {
             if (component.type === 'text') {
               return (
-                <textarea
+                <div>
+                    <textarea
                   key={index}
                   placeholder="Enter text here..."
                   className="w-full p-2 mb-4 border rounded-md focus:outline-none"
                   value={component.content}
                   onChange={(e) => updateContent(index, e.target.value)}
-                />
+                />  
+                <button onClick={()=>deleteComponent(index)}>X</button>
+                </div>
+                
               );
             } else if (component.type === 'image') {
               return (
@@ -105,19 +114,22 @@ const Create = () => {
                     onChange={(e) => handleImageChange(e, index)}
                   />
           
-             
+                <button className='' onClick={()=>deleteComponent(index)}>X</button>
                 </div>
               );
             } else if (component.type === 'title') {
               return (
-                <input
-                  key={index}
-                  type="text"
-                  placeholder="Enter title here..."
-                  className="w-full p-2 mb-4 border rounded-md focus:outline-none"
-                  value={component.content}
-                  onChange={(e) => updateContent(index, e.target.value)}
-                />
+                <div>
+                  <input
+                    key={index}
+                    type="text"
+                    placeholder="Enter title here..."
+                    className="w-full p-2 mb-4 border rounded-md focus:outline-none"
+                    value={component.content}
+                    onChange={(e) => updateContent(index, e.target.value)}
+                  />
+                  <button onClick={()=>deleteComponent(index)}>X</button>
+                </div>
               );
             }
             return null;

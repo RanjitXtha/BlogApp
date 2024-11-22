@@ -41,17 +41,17 @@ app.post('/login',LogIn);
 
 app.post('/api/addblog', upload.any(), async (req, res) => {
   const { title, author, userId , content } = req.body;
-  console.log(content);
+  //console.log(content);
   const parsedContent = JSON.parse(content);
-  console.log(parsedContent);
+  //console.log(parsedContent);
 
   const images = [];
 
   req.files.forEach((file) => {
+    console.log(file)
     images.push({
-      fieldname: file.fieldname,
       path: file.path,
-      filename: file.originalname,
+      filename: file.filename,
     });
   });
   console.log(images);
@@ -66,25 +66,25 @@ app.post('/api/addblog', upload.any(), async (req, res) => {
     const images = req.files.map(file => `/uploads/${file.filename}`);
     console.log(images);
 */
-     const formattedComponents = parsedContent.map((component, index) => {
+     const formattedContent = parsedContent.map((component, index) => {
       if (component.type === "image") {
         // Find the corresponding file
         const imageFile = req.files.find((file) => file.fieldname === `image-${index}`);
         return {
           type: "image",
-          content: imageFile ? imageFile.path : null, // Save image path
+          content: imageFile ? imageFile.filename : null, // Save image path
         };
       } else {
         return component; // Keep text content as is
       }
     });
-    
+    //console.log(formattedContent)
 
     const newData = new blogData({
       title,
       author,
       userId,
-      components: formattedComponents,
+      content: formattedContent,
     });
 
     await newData.save();
