@@ -3,7 +3,6 @@ import { IoSearch } from "react-icons/io5";
 import { UserAuthContext } from '../Context/userAuth';
 const Header = () => {
   const {username , profilePic} = useContext(UserAuthContext);
-  console.log(profilePic)
   return (
     <div className='w-full px-[3rem] py-[0.5rem] grid grid-cols-[10%_1fr_25%] items-center'>
         <div className='font-extrabold text-xl  '>Blogger</div>

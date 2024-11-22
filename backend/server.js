@@ -39,27 +39,61 @@ app.post('/login',LogIn);
 
 
 
-app.post('/api/addblog', upload.single('image'), async (req, res) => {
-  const { userId, title, author, content } = req.body;
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;  // Get the image URL if available
-
-  console.log('Received blog post data:');
-  console.log(title, author, userId);
+app.post('/api/addblog', upload.any(), async (req, res) => {
+  const { title, author, userId , content } = req.body;
   console.log(content);
+  const parsedContent = JSON.parse(content);
+  console.log(parsedContent);
 
-  const newData = new blogData({
-    title,
-    author,
-    userId,
-    content,
-    image: imageUrl,  // Save the image URL in the blog post
+  const images = [];
+
+  req.files.forEach((file) => {
+    images.push({
+      fieldname: file.fieldname,
+      path: file.path,
+      filename: file.originalname,
+    });
   });
-
+  console.log(images);
   try {
+    /*
+    // Collect all content fields
+    const components = Object.entries(req.body)
+      .filter(([key]) => key.startsWith('content-')) // Match content-{index} keys
+      .map(([_, value]) => JSON.parse(value)); // Parse their JSON values
+
+    console.log(components); // Log parsed content components
+    const images = req.files.map(file => `/uploads/${file.filename}`);
+    console.log(images);
+*/
+     const formattedComponents = parsedContent.map((component, index) => {
+      if (component.type === "image") {
+        // Find the corresponding file
+        const imageFile = req.files.find((file) => file.fieldname === `image-${index}`);
+        return {
+          type: "image",
+          content: imageFile ? imageFile.path : null, // Save image path
+        };
+      } else {
+        return component; // Keep text content as is
+      }
+    });
+    
+
+    const newData = new blogData({
+      title,
+      author,
+      userId,
+      components: formattedComponents,
+    });
+
     await newData.save();
-    res.status(201).json(newData);  // Return the newly created blog post
+    res.status(201).json('blog posted sucessfully');
+    
+
   } catch (error) {
-    res.status(500).json({ message: 'Error adding blog post', error });
+    console.error('Error:', error.message);
+    res.status(500).json(error);
   }
 });
 

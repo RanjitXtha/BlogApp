@@ -2,73 +2,82 @@ import React, { useContext } from 'react'
 import {useEffect, useState} from 'react';
 import { UserAuthContext } from '../Context/userAuth';
 import Header from '../Sections/Header';
+import { useNavigate } from 'react-router-dom';
 
 const Create = () => {
-  const { userId, username } = useContext(UserAuthContext);
+  const navigate = useNavigate();
+    const { userId, username } = useContext(UserAuthContext);
 
-  const [mainTitle, setMainTitle] = useState('');
-  const [components, setComponents] = useState([]);
-  const [imagePreview, setImagePreview] = useState(null);  // To show the image preview
+    const [mainTitle, setMainTitle] = useState('');
+    const [components, setComponents] = useState([]);
+    const [imagePreview, setImagePreview] = useState(null); 
 
-  const addComponent = (type) => {
-    setComponents([...components, { type, content: '' }]);
-  };
+    const addComponent = (type) => {
+        setComponents([...components, { type, content: '' }]);
+        console.log(components)
+      };
 
-  const updateContent = (index, newContent) => {
-    const updatedComponents = [...components];
-    updatedComponents[index].content = newContent;
-    setComponents(updatedComponents);
-  };
+      const updateContent = (index, newContent) => {
+        const updatedComponents = [...components];
+        updatedComponents[index].content = newContent;
+        setComponents(updatedComponents);
+      };
 
-  const handleImageChange = (e, index) => {
-    const file = e.target.files[0];
-    const updatedComponents = [...components];
-    updatedComponents[index].content = file;  // Save the file object
-    setComponents(updatedComponents);
+      const handleImageChange = (e, index) => {
+        const file = e.target.files[0];
+        if (!file) return;
+      
+        const updatedComponents = [...components];
+        updatedComponents[index].content = file;  
+        setComponents(updatedComponents);
+      
+        console.log('Updated components:', updatedComponents);
+      };
 
-    // Show image preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);  // Set the preview
-    };
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log('Submit clicked');
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        try{
 
-    // Prepare form data for uploading
-    const formData = new FormData();
-    formData.append('title', mainTitle);
-    formData.append('author', username);
-    formData.append('userId', userId);
-    formData.append('content', JSON.stringify(components));
+        const formData = new FormData();
+    
+        formData.append('title', mainTitle);
+        formData.append('author', username);
+        formData.append('userId', userId);
+        formData.append("content", JSON.stringify(components));
 
-    // Append image if available
-    if (imagePreview) {
-      const imageComponent = components.find((component) => component.type === 'image');
-      if (imageComponent && imageComponent.content) {
-        formData.append('image', imageComponent.content);  // Attach the image file
+        components.forEach((component, index) => {
+          if (component.type === "image") {
+            formData.append(`image-${index}`, component.content); // Append File objects
+          }
+        });
+
+        //console.log(formData)
+        
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}:`, value);
+          }
+      
+        const response = await fetch('http://localhost:5000/api/addblog', {
+          method: 'POST',
+          body: formData,  
+        });
+    
+        const data = await response.json();
+        if(response.ok){
+          navigate('/');
+        }
+      }catch(err){
+        console.log(err)
       }
-    }
+      };
 
-    // Send POST request
-    const response = await fetch('http://localhost:5000/api/addblog', {
-      method: 'POST',
-      body: formData,  // Send form data including image
-    });
-
-    const data = await response.json();
-    console.log(data);
-  };
 
   return (
     <div>
-      <Header />
-      <form onSubmit={handleSubmit}>
+     
+      
+        <form onSubmit={handleSubmit}>
         <div className="p-8 bg-white rounded-md shadow-md px-[5rem]">
           <input
             type="text"
@@ -95,8 +104,8 @@ const Create = () => {
                     className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:border-0 file:text-white file:bg-blue-600 hover:file:bg-blue-700"
                     onChange={(e) => handleImageChange(e, index)}
                   />
-                  {/* Display image preview */}
-                  {imagePreview && <img src={imagePreview} alt="Image Preview" className="mt-4 w-full h-auto" />}
+          
+             
                 </div>
               );
             } else if (component.type === 'title') {
@@ -112,9 +121,9 @@ const Create = () => {
               );
             }
             return null;
-          })}
+          })
+          }
 
-          {/* Add Component Section */}
           <div className="mt-4">
             <select
               className="p-2 border rounded-lg"
@@ -136,7 +145,7 @@ const Create = () => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
 export default Create;

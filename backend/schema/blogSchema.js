@@ -10,10 +10,12 @@ const blogSchema = new mongoose.Schema({
     title: {type:String, required:true},
     author: String,
     userId:String,
+    likes:{ type:Number , min:0 ,default:0 },
     content: [
       {
         type: { type: String, enum: ["text", "image", "title"], required: true },
-        content: { type: String, required: true }
+        content: { type: String, required: true },
+        // type: mongoose.Schema.Types.Mixed, required: true
       }
     ],
     comments:[commentSchema],
