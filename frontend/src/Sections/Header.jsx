@@ -4,8 +4,9 @@ import { UserAuthContext } from '../Context/userAuth';
 const Header = () => {
   const {username , profilePic} = useContext(UserAuthContext);
   return (
-    <div className='w-full px-[3rem] py-[0.5rem] grid grid-cols-[10%_1fr_25%] items-center'>
+    <div className='bg-white w-full h-[3.2rem] px-[3rem] py-[0.5rem] grid grid-cols-[10%_1fr] items-center'>
         <div className='font-extrabold text-xl  '>Blogger</div>
+        <div className='flex justify-between'>
         <div className='flex h-full '>
             <span className='h-full py-[0.3rem] pl-[0.7rem] pr-[0.3rem] text-xl rounded-tl-full rounded-bl-full bg-bgColor flex items-center'><IoSearch/></span>
             <input className='h-full py-[0.3rem] px-[0.3rem] rounded-tr-full rounded-br-full bg-bgColor focus:outline-none' type="search" placeholder='Search' />
@@ -18,6 +19,7 @@ const Header = () => {
                   <img src={`http://localhost:5000/uploads/${profilePic}`} alt={username} />
                 </div>
             </div>
+        </div>
         </div>
     </div>
   )

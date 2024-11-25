@@ -1,7 +1,8 @@
 
 import { useEffect , useState} from 'react';
 import React from 'react'
-
+import { AiOutlineLike } from "react-icons/ai";
+import { FaRegCommentAlt } from "react-icons/fa";
 
 const AllBlogs = () => {
   console.log("run")
@@ -20,17 +21,17 @@ const AllBlogs = () => {
   return (
     <div>
     {blogs.map((blog) => (
-      <div key={blog._id} className="bg-red-400 w-full flex mb-4">
-        <div className="w-[10rem] bg-blue-400">
+      <div key={blog._id} className="bg-white w-full flex gap-6 border-b-[1px] border-gray-200">
+        <div className="w-[10rem] my-auto">
           {/* Loop through the blog content and display images */}
           {blog.content.map((item, index) => (
             item.type === 'image' ? (
-            <div>
-              <img
+            <div className='w-full h-[6rem] bg-red-500'>
+               <img
                 key={index}
                 src={`http://localhost:5000/uploads/${item.content}`}
                 alt={item.filename}
-                className="w-full h-auto"
+                className="w-full object-cover"
               />
               </div>
             ) : null
@@ -44,11 +45,11 @@ const AllBlogs = () => {
               <p className="text-sm">By {blog.author}</p>
             </div>
 
-            <h1>{blog.title}</h1>
+            <h1 className='text-2xl font-bold'>{blog.title}</h1>
             <p>This is a description</p>
-            <p>
-              <span>Likes: {blog.likes}</span>
-              <span> Comments: {blog.comments.length}</span>
+            <p className='flex gap-6'>
+              <span className='flex items-center'><AiOutlineLike className='mr-2 text-2xl' />{blog.likes}</span>
+              <span className='flex items-center'>< FaRegCommentAlt className='mr-2 text-lg'/> {blog.comments.length}</span>
             </p>
           </span>
         </div>

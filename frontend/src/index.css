@@ -8,3 +8,6 @@ img{
     object-fit: contain;
 }
 
+body{
+    background-color: rgb(249,249,249);
+}

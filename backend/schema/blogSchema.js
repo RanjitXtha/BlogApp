@@ -11,6 +11,7 @@ const blogSchema = new mongoose.Schema({
     author: String,
     userId:String,
     description:String,
+    banner:String,
     likes:{ type:Number , min:0 ,default:0 },
     content: [
       {
